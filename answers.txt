@@ -1,0 +1,26 @@
+Felicia Suryawinata fsuryawinata 1297668
+
+Planning
+1. The server should accept the calls from just a subset of users to avoid congestion.
+2. Authentication should be provided by the RPC framework since identity only needs to be checked once before accessing its information.
+3. TCP should be used since it is reliable and has congestion control, unlike UDP.
+4. The socket should be created in the initialising function
+5. Both should be allocated dynamically. This is so server can accept more requests and client can free used memory once closed.
+6. When hosts use different byte orderings, there may be a communication error, which means data can be interpreted differently. 
+   Network byte order is a standardised language for both hosts so they can communicate seamlessly.
+
+Protocol
+The protocol initialises the server using a port number using rpc_init_server. It initialises the client using rpc_init_client
+by taking an IP address and the same port number you used to initialise the server as arguments.
+Functions are registered from the server and stored into the server memory.
+Functions can then be searched from the client to check if it exists and has been registered in the server using rpc_find. 
+If it does exist, the protocol returns a handle specifying the ID of the function in the server. You can then use the handle and
+a struct of arguments in the form of int data1, size_t data2_len and void *data2 to call the function using rpc_call.
+After using the client, close the client using rpc_close_client.
+
+The protocol uses a fixed limit variable to encode the size of the data block. 
+It limits the size to a maximum of 100000, which is the maximum test case data2_len.
+This way, it is simpler to code and can handle most data2 variables.
+
+The transport layer used in the protocol is TCP since it is the most reliable and has congestion control. Another alternative is UDP.
+Even though UDP has less overhead than TCP, it is less reliable.
